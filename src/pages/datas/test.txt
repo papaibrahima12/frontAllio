@@ -1,0 +1,271 @@
+import {
+    Card,
+    CardHeader,
+    CardBody,
+    CardFooter,
+    Typography,
+    Avatar,
+    Chip,
+    Tooltip,
+    Button,
+    IconButton,
+    Dialog,
+  DialogHeader,
+  DialogBody,
+   
+  } from "@material-tailwind/react";
+ 
+  import { useEffect,useState } from 'react';
+  import { getCamp, deletCamp } from '../../api/axios'; // Assurez-vous d'avoir la fonction addcamp définie dans votre fichier d'API.
+  import { routeHandler } from '../../api/routeHandler';
+  import React from "react";
+  
+  import { Link } from "react-router-dom";
+  import { Pagination } from '../dashboard/pagination';
+  import {  authorsTableData, projectsData } from "@/data";
+  export function DataCamp() {
+    // const navigateTo = useNavigate();
+    const [data, setData] = useState([]);
+    const [active, setActive] = useState(1);
+    const dataPerPage = 5; // Nombre d'éléments par page
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen((cur) => !cur);
+
+    const handleDeleteCamp = (id) => {
+      deletCamp(id)
+        .then((response) => {
+          // Mettez à jour l'état ou effectuez d'autres actions si nécessaire
+          console.log('Campagne supprimée avec succès', response);
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error('Erreur lors de la suppression de la campagne :', error);
+        });
+    };
+    
+    useEffect(() => {
+        getCamp()
+          .then(res => {
+            console.log("testermmes donnees",res.data); // Log the received data
+            setData(res.data);
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+          });
+      }, []);
+
+      // La pagination des pages
+    const indexOfLastData = active * dataPerPage;
+    const indexOfFirstData = indexOfLastData - dataPerPage;
+    const currentData = data.slice(indexOfFirstData, indexOfLastData);
+
+  const paginate = (pageNumber) => {
+    if (pageNumber === "prev" && active > 1) {
+      setActive(active - 1);
+    } else if (pageNumber === "next" && active < Math.ceil(data.length / dataPerPage)) {
+      setActive(active + 1);
+    } else {
+      setActive(pageNumber);
+    }
+  };
+
+      return(
+        <>
+        <div className="mt-12 mb-8 flex flex-col gap-12">
+      
+      {/* befor card */}
+      <Card>
+        <CardHeader  color="gray" className="mb-8 p-6 bg-lycs">
+          <Typography variant="h6" color="white">
+            Recentes
+          </Typography>
+        </CardHeader>
+        <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
+        <div className="mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4">
+              {projectsData.map(
+                ({ img, title, description, tag, route, members }) => (
+                  <Card key={title} color="transparent" shadow={false}>
+                    <CardHeader
+                      floated={false}
+                      color="gray"
+                      className="mx-0 mt-0 mb-4 h-64 xl:h-40"
+                    >
+                      <img
+                        src={img}
+                        alt={title}
+                        className="h-full w-full object-cover"
+                      />
+                    </CardHeader>
+                    <CardBody className="py-0 px-1">
+                      <Typography
+                        variant="small"
+                        className="font-normal text-blue-gray-500"
+                      >
+                        {tag}
+                      </Typography>
+                      <Typography
+                        variant="h5"
+                        color="blue-gray"
+                        className="mt-1 mb-2"
+                      >
+                        {title}
+                      </Typography>
+                      <Typography
+                        variant="small"
+                        className="font-normal text-blue-gray-500"
+                      >
+                        {description}
+                      </Typography>
+                    </CardBody>
+                    <CardFooter className="mt-6 flex items-center justify-between py-0 px-1">
+                      <Link to={route}>
+                        <Button variant="outlined" size="sm">
+                          view project
+                        </Button>
+                      </Link>
+                      <div>
+                        {members.map(({ img, name }, key) => (
+                          <Tooltip key={name} content={name}>
+                            <Avatar
+                              src={img}
+                              alt={name}
+                              size="xs"
+                              variant="circular"
+                              className={`cursor-pointer border-2 border-white ${
+                                key === 0 ? "" : "-ml-2.5"
+                              }`}
+                            />
+                          </Tooltip>
+                        ))}
+                      </div>
+                    </CardFooter>
+                  </Card>
+                )
+              )}
+            </div>
+        </CardBody>
+      </Card>
+      <Card>
+        <CardHeader   color="gray" className="mb-8 p-6 bg-lycs">
+          <Typography variant="h6" color="white">
+            Toutes les Campagnes
+          </Typography>
+        </CardHeader>
+        <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
+          <table className="w-full min-w-[640px] table-auto">
+            <thead>
+              <tr>
+                {["Nom Campagen", "Code Promo", "Date debut", "Date fin","Age cible" ,"Sexe cible" ,"Adresse","Action",""].map((el) => (
+                  <th
+                    key={el}
+                    className="border-b border-blue-gray-50 py-3 px-5 text-left"
+                  >
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-bold uppercase text-blue-gray-400"
+                    >
+                      {el}
+                    </Typography>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+      {currentData.map((camp, index) => (
+        <tr key={index}>
+          <td className="py-3 px-5  "
+        onClick={handleOpen}>
+          
+            <div className="flex items-center gap-4">
+             
+              <Typography
+                variant="small"
+                color="blue-gray"
+                className="font-semibold"
+              >
+                {camp.nomCampagne}
+                <Dialog size="xs" open={open} handler={handleOpen}>
+                <DialogHeader className="justify-between">
+                <Typography
+                variant="small"
+                color="blue-gray"
+                className="font-medium"
+              >
+                {camp.nomCampagne}
+              </Typography>
+              <Button variant="text" color="blue-gray" onClick={handleOpen}>
+            Fermer
+          </Button>
+                </DialogHeader>
+                <DialogBody>
+                <img src={camp.image} alt={camp.nomCampagne} className="h-full w-full object-cover object-center" />
+                </DialogBody>
+                </Dialog>
+              </Typography>
+              
+            </div>
+           
+          </td>
+          <td className="py-3 px-5">
+            <Typography className="text-xs font-semibold text-blue-gray-600">
+              {camp.codePromo}
+            </Typography>
+          </td>
+          <td className="py-3 px-5">
+            <Typography className="text-xs font-semibold text-blue-gray-600">
+              {camp.dateDebut}
+            </Typography>
+          </td>
+          {/* Include other columns for different fields */}
+          <td className="py-3 px-5">
+            <Typography className="text-xs font-semibold text-blue-gray-600">
+              {camp.dateFin}
+            </Typography>
+          </td>
+          
+          <td className="py-3 px-5">
+            <Typography className="text-xs font-semibold text-blue-gray-600">
+              {camp.ageCible}
+            </Typography>
+            
+          </td>
+          <td className="py-3 px-5">
+            <Typography className="text-xs font-semibold text-blue-gray-600">
+              {camp.sexeCible}
+            </Typography>
+            
+          </td>
+          <td className="py-3 px-5">
+            <Typography className="text-xs font-semibold text-blue-gray-600">
+              {camp.localisation}
+            </Typography>
+            
+          </td>
+          <td >
+                      <Tooltip content="Modifier">
+                        <IconButton variant="text" color="green">
+                        <i className="fa-solid fa-pen-to-square"/>
+                         
+                        </IconButton>
+                       
+                      </Tooltip>
+                      <Tooltip content="Supprimer" >
+                        <IconButton variant="text" color="red" onClick={() => handleDeleteCamp(camp.id)}>
+                        <i className="fas fa-trash" />
+                         
+                        </IconButton>
+                       
+                      </Tooltip>
+                    </td>
+        </tr>
+      ))}
+    </tbody>
+          </table>
+        </CardBody>
+        <Pagination dataPerPage={dataPerPage} totalData={data.length} paginate={paginate} />
+
+      </Card>
+    </div>
+        </>
+
+      )}
