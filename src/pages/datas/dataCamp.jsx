@@ -17,8 +17,9 @@ import {
   import { getCamp, deletCamp } from '../../api/axios'; // Assurez-vous d'avoir la fonction addcamp définie dans votre fichier d'API.
   import { routeHandler } from '../../api/routeHandler';
   import React from "react";
+  import { UpdateCamp } from "./updateCamp";
   
-  import { Link } from "react-router-dom";
+  import { Link, useParams } from "react-router-dom";
   import { Pagination } from '../dashboard/pagination';
   import {  authorsTableData, projectsData } from "@/data";
   export function DataCamp() {
@@ -45,6 +46,11 @@ import {
           console.error('Erreur lors de la suppression de la campagne :', error);
         });
     };
+    const handleEdit= ()=> {
+      const  {id} = useParams();
+  
+      
+    }
     
     useEffect(() => {
         getCamp()
@@ -224,13 +230,13 @@ import {
           </td>
           <td className="py-3 px-5">
             <Typography className="text-xs font-semibold text-blue-gray-600">
-              {camp.dateDebut}
+              {new Date(camp.dateDebut).toLocaleDateString('fr-FR')}
             </Typography>
           </td>
           {/* Include other columns for different fields */}
           <td className="py-3 px-5">
             <Typography className="text-xs font-semibold text-blue-gray-600">
-              {camp.dateFin}
+              {new Date(camp.dateFin).toLocaleDateString('fr-FR')}
             </Typography>
           </td>
           
@@ -254,7 +260,7 @@ import {
           </td>
           <td >
                       <Tooltip content="Modifier">
-                        <IconButton variant="text" color="green">
+                        <IconButton variant="text" color="green" onClick={UpdateCamp}>
                         <i className="fa-solid fa-pen-to-square"/>
                          
                         </IconButton>

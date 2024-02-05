@@ -146,18 +146,7 @@ export  function Login() {
           </Button>
           
           <div className="flex items-center justify-between gap-2 mt-6">
-            <Checkbox
-              label={
-                <Typography
-                  variant="small"
-                  color="gray"
-                  className="flex items-center justify-start font-medium"
-                >
-                  Subscribe me to newsletter
-                </Typography>
-              }
-              containerProps={{ className: "-ml-2.5" }}
-            />
+            
             <Typography variant="small" className="font-medium text-gray-900">
               <a href="#">
                 Mot de passe oublié

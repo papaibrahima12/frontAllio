@@ -29,23 +29,23 @@ export function SignUp() {
     if (formInput.password !== formInput.new_password) {
       setError(" ❌ Les mots de passe ne correspondent pas");
     }else{
-      // signup(formInput)
-      //     .then(res => {
-      //         setFormInput({
-      //           telephone: "",
-      //           email: "",
-      //           ninea: "",
-      //           adresse:"",
-      //           password: "",
-      //           new_password:""
-      //         })
-      //         setJWt(res.data)
-      //         // navigateTo("/auth/sign-in")
+      signup(formInput)
+          .then(res => {
+              setFormInput({
+                telephone: "",
+                email: "",
+                ninea: "",
+                adresse:"",
+                password: "",
+                new_password:""
+              })
+              setJWt(res.data)
+              // navigateTo("/auth/sign-in")
               
-      //     })
-      //     .catch(error => {
-      //         alert(error.message)
-      //     })
+          })
+          .catch(error => {
+              alert(error.message)
+          })
           setError("")
   }
 }

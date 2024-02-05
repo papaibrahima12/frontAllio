@@ -30,7 +30,12 @@ export function Campagne() {
   const [jwt, setJWt] = auth;
   const [open, setOpen] = React.useState(false);
   // const [file, setFile]= useState();
- 
+  const options = [
+    { value: 'Dakar', label: 'Dakar' },
+    { value: 'Diourbel', label: 'Diourbel' },
+    { value: 'Fatick', label: 'Fatick' },
+    // ... add other options
+  ];
   
   
   // le formulaire
@@ -42,6 +47,7 @@ export function Campagne() {
     ageCible: "",
     sexeCible: "",
     localisation:"",
+    typeDeCible:"",
     image: ""
     
 
@@ -69,6 +75,7 @@ export function Campagne() {
     formData.append("ageCible", formInput.ageCible);
     formData.append("sexeCible", formInput.sexeCible);
     formData.append("localisation", formInput.localisation);
+    formData.append("typeDeCible", formInput.typeDeCible);
     formData.append("image", formInput.image);
   
     console.log('mon formulaire', formInput);
@@ -83,6 +90,7 @@ export function Campagne() {
           ageCible: "",
           sexeCible: "",
           localisation: "",
+          typeDeCible:"",
           image: "",
         });
         setJWt(res.data);
@@ -92,7 +100,10 @@ export function Campagne() {
         console.error("Erreur :", error);
       });
   };
-  
+  const handleLocalisationChange = (e) => {
+    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+    setFormInput({ ...formInput, localisation: selectedOptions });
+  };
   const handleOpen = () => setOpen((cur) => !cur);
   return (
     <>
@@ -137,26 +148,27 @@ export function Campagne() {
               <option value="Feminin">Feminin</option>
               
             </select> 
-            <select 
-              onChange={(e) => setFormInput({ ...formInput, localisation: e.target.value }) }
-              value={formInput.localisation}
-             label="Choisi ton adress" id="underline_select" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-            <option value="Dakar"> Dakar</option>
-              <option value="Diourbel">Diourbel</option>
-              <option value="Fatick">Fatick</option>
-              <option value="Kaffrine">Kaffrine</option>
-              <option value="Kaolack">Kaolack</option>
-              <option value="Kedougou">Kedougou</option>
-              <option value="Kolda"> Kolda</option>
-              <option value="Louga">Louga </option>
-              <option value="Matam"> Matam</option>
-              <option value="Saint-Louis"> Saint-Louis</option>
-              <option value="Sedhiou"> Sedhiou</option>
-              <option value="Tambacounda">Tambacounda</option>
-              <option value="Thies">Thies</option>
-              <option value="Ziguinchor">Ziguinchor</option>
+            <select label="Type de cible" size="lg"  onChange={(e) => setFormInput({ ...formInput, typeDeCible: e.target.value }) }
+               class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer"
+                value={formInput.typeDeCible} >
+              <option value="Regions">Regions</option>
+              <option value="--">--</option>
               
-            </select>
+            </select> 
+            <select
+      onChange={handleLocalisationChange}
+      value={formInput.localisation}
+      label="Choisi ton adress"
+      id="underline_select"
+      className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer"
+      multiple
+    >
+      {options.map(option => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
              
               
             <Input label="Image" size="lg" type="file" accept="image/*"

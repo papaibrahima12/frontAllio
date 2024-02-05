@@ -1,128 +1,82 @@
 import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Typography,
-  Avatar,
-  Chip,
-  Tooltip,
-  Button,
-  Dialog,
-  Input,
-  select,
-  option,
-  Checkbox,
-} from "@material-tailwind/react";
-import { useEffect, useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../App';
-import { addBon, getBon } from '../../api/axios'; // Assurez-vous d'avoir la fonction addBon définie dans votre fichier d'API.
-import { routeHandler } from '../../api/routeHandler';
-import React from "react";
-import { Link } from "react-router-dom";
-
-import {  projectsData } from "@/data";
-import { DataBon } from "../datas";
-export function Bon() {
-  // const navigateTo = useNavigate();
-  const [data, setData] = useState([]);
-  const { auth } = useContext(AuthContext);
-  const [jwt, setJWt] = auth;
-  const [open, setOpen] = React.useState(false);
-  // le formulaire
-  const [formInput, setFormInput] = React.useState({
-    nomBon: "",
-    dateDebut: "",
-    dateFin: "",
-    typeBon: "",
-    typeReduction: "",
-    codeReduction: "",
-    reduction: "",
-    ageCible: "",
-    sexeCible: "",
-    localisation:"",
-    typeDeCible:"",
-    image:""
-
-  });
-  
-  const handFile = (e) => {
-    const data = new FormData();
-    data.append('image', e.target.files[0]);
-  
-    setFormInput({
-      ...formInput,
-      image: e.target.files[0], 
-    });
-  
+    Card,
+    CardHeader,
+    CardBody,
+    CardFooter,
+    Typography,
+    Dialog,
+    Tooltip,
+    Button,
+    IconButton,
+    Input
    
-  };
-  // La fonction ajouter des produits
-  const handleAddBon = () => {
-    const formData = new FormData();
-    formData.append("nomBon", formInput.nomBon);
-    formData.append("dateDebut", formInput.dateDebut);
-    formData.append("dateFin", formInput.dateFin);
-    formData.append("typeBon", formInput.typeBon);
-    formData.append("typeReduction", formInput.typeReduction);
-    formData.append("codeReduction", formInput.codeReduction);
-    formData.append("reduction", formInput.reduction);
-    formData.append("ageCible", formInput.ageCible);
-    formData.append("sexeCible", formInput.sexeCible);
-    formData.append("localisation", formInput.localisation);
-    formData.append("typeDeCible", formInput.typeDeCible);
-    formData.append("image", formInput.image);
+  } from "@material-tailwind/react";
+  import axios from "axios";
+  import { useEffect, useContext, useState } from 'react';
+  import { getCamp, updateBon } from '../../api/axios'; // Assurez-vous d'avoir la fonction addBon définie dans votre fichier d'API.
+  import { routeHandler } from '../../api/routeHandler';
+  import React from "react";
   
-
-    addBon(formData)
-      .then(res => {
-        setFormInput({
-          nomBon: "",
-          dateDebut: "",
-          dateFin: "",
-          typeBon: "",
-          typeReduction: "",
-          codeReduction: "",
-          reduction: "",
-          ageCible: "",
-          sexeCible: "",
-          localisation:"",
-          typeDeCible:"",
-          image:""
-        });
-        // Vous pouvez mettre à jour l'état ou effectuer d'autres actions après l'ajout du produit.
-        setJWt(res.data);
-        // Naviguer vers une autre page ou effectuer d'autres actions si nécessaire.
-      })
-      .catch(error => {
-        alert(error.message);
-        console.error(" the eror",error)
+  import { Link , useParams} from "react-router-dom";
+  export function UpdateCamp() {
+    // const navigateTo = useNavigate();
+    const [data, setData] = useState([]);
+    const dataPerPage = 5; // Nombre d'éléments par page
+    const [open, setOpen] = React.useState(false);
+    const {id} = useParams();
+    const [formInput, setFormInput] = React.useState({
+      nomBon: "",
+      dateDebut: "",
+      dateFin: "",
+      typeBon: "",
+      typeReduction: "",
+      codeReduction: "",
+      reduction: "",
+      ageCible: "",
+      sexeCible: "",
+      localisation:"",
+      image:""
+  
+    });
+    const handFile = (e) => {
+      const data = new FormData();
+      data.append('image', e.target.files[0]);
+    
+      setFormInput({
+        ...formInput,
+        image: e.target.files[0], 
       });
-      console.log('mon formulaire', formInput);
-  };
+    
+     
+    };
+
   
-  // useEffect(()=>{
-  //   routeHandler(navigateTo, jwt)
-  // },[])
-
-
-  const handleOpen = () => setOpen((cur) => !cur);
+  
+    const handleOpen = () => setOpen((cur) => !cur);
   useEffect(() => {
-    getBon()
-      .then(res => {
-        console.log("testermmes donnees",res.data); // Log the received data
-        setData(res.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
- 
-  return (
-    <>
-     <Button onClick={handleOpen} className="bg-lycs">Ajout <i className="fas fa-add b" /></Button>
-     <Dialog
+        getCamp(id)
+          .then(res => {
+            console.log("testermmes donnees",res.data); // Log the received data
+            
+            setData(res.data);
+            
+
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+          });
+      }, []);
+
+      // La pagination des pages
+    const indexOfLastData = active * dataPerPage;
+    const indexOfFirstData = indexOfLastData - dataPerPage;
+    const currentData = data.slice(indexOfFirstData, indexOfLastData);
+    const lastestBons = data.slice().reverse().slice(0, 4);
+  
+      return(
+        <>
+        {/* debut Modification */}
+        <Dialog
         size="xs"
         open={open}
         handler={handleOpen}
@@ -174,13 +128,6 @@ export function Bon() {
               <option value="Feminin">Feminin</option>
               
             </select> 
-            <select label="Type de cible" size="lg"  onChange={(e) => setFormInput({ ...formInput, typeDeCible: e.target.value }) }
-               class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer"
-                value={formInput.typeDeCible} >
-              <option value="Regions"> Regions</option>
-              <option value="--">--</option>
-              
-            </select> 
             <select 
               onChange={(e) => setFormInput({ ...formInput, localisation: e.target.value }) }
               value={formInput.localisation}
@@ -223,11 +170,9 @@ export function Bon() {
           </CardFooter>
         </Card>
       </Dialog>
-            <DataBon/>
-    </>
+        {/* Fin Modification */}
+       
     
-  );
-}
-
-export default Bon;
-
+        </>
+      );
+    }  
